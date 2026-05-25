@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { DatePicker } from './DatePicker'
-import { STOPS } from '../data/pushkino'
+import { StopCombobox } from './StopCombobox'
 import { isStopId, sanitizeIsoDate } from '../utils/security'
 import type { SearchFormValues } from '../types/search'
 import type { StopId } from '../types/schedule'
@@ -10,28 +10,25 @@ interface SearchFormProps {
   onSearch: (values: SearchFormValues) => void
 }
 
-function readStopFromSelect(value: string): StopId | null {
-  return isStopId(value) ? value : null
-}
-
 const DATE_MIN = '2024-01-01'
 const DATE_MAX = '2030-12-31'
 
 export function SearchForm({ initial, onSearch }: SearchFormProps) {
+  const [from, setFrom] = useState<StopId>(initial.from)
+  const [to, setTo] = useState<StopId>(initial.to)
   const [dateIso, setDateIso] = useState(initial.dateIso)
 
   useEffect(() => {
+    setFrom(initial.from)
+    setTo(initial.to)
     setDateIso(initial.dateIso)
-  }, [initial.dateIso])
+  }, [initial.from, initial.to, initial.dateIso])
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const form = new FormData(e.currentTarget)
-    const from = readStopFromSelect(String(form.get('from') ?? ''))
-    const to = readStopFromSelect(String(form.get('to') ?? ''))
     const safeDate = sanitizeIsoDate(dateIso)
-
-    if (!from || !to || !safeDate) return
+    if (!isStopId(from) || !isStopId(to) || !safeDate) return
+    if (from === to) return
     onSearch({ from, to, dateIso: safeDate })
   }
 
@@ -42,21 +39,7 @@ export function SearchForm({ initial, onSearch }: SearchFormProps) {
   return (
     <form className="search-form" onSubmit={handleSubmit}>
       <div className="search-form__row">
-        <label className="field">
-          <span className="field__label">Откуда</span>
-          <select
-            name="from"
-            className="field__control"
-            defaultValue={initial.from}
-            required
-          >
-            {STOPS.map((stop) => (
-              <option key={stop.id} value={stop.id}>
-                {stop.name}
-              </option>
-            ))}
-          </select>
-        </label>
+        <StopCombobox label="Откуда" value={from} onChange={setFrom} required />
 
         <button
           type="button"
@@ -68,21 +51,7 @@ export function SearchForm({ initial, onSearch }: SearchFormProps) {
           ⇄
         </button>
 
-        <label className="field">
-          <span className="field__label">Куда</span>
-          <select
-            name="to"
-            className="field__control"
-            defaultValue={initial.to}
-            required
-          >
-            {STOPS.map((stop) => (
-              <option key={stop.id} value={stop.id}>
-                {stop.name}
-              </option>
-            ))}
-          </select>
-        </label>
+        <StopCombobox label="Куда" value={to} onChange={setTo} required />
       </div>
 
       <div className="field field--date">

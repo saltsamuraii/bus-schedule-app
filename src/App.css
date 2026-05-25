@@ -115,6 +115,45 @@
   max-width: 100%;
 }
 
+.stop-combobox {
+  position: relative;
+}
+
+.stop-combobox__list {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 0.2rem);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 0.25rem 0;
+  list-style: none;
+  max-height: 12rem;
+  overflow-y: auto;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
+}
+
+.stop-combobox__option {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.65rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  text-align: left;
+  color: var(--color-text);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.stop-combobox__option:hover,
+.stop-combobox__option--active {
+  background: var(--color-surface-2);
+}
+
 .swap-btn {
   align-self: end;
   margin-bottom: 0.15rem;

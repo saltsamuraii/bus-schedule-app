@@ -3,6 +3,20 @@ import { STOP_IDS } from '../data/pushkino'
 
 const STOP_ID_SET = new Set<string>(STOP_IDS)
 
+/**
+ * Sanitize free-text typed in the station search field.
+ * This string is only used for filtering UI; stop ids still go through allowlist.
+ */
+export function sanitizeStopQuery(raw: unknown): string {
+  if (typeof raw !== 'string') return ''
+  let out = ''
+  for (const ch of raw) {
+    const code = ch.charCodeAt(0)
+    if (code >= 0x20 && code !== 0x7f) out += ch
+  }
+  return out.trim().slice(0, 80)
+}
+
 /** Allowlist: only known stop ids from static data. */
 export function isStopId(value: unknown): value is StopId {
   return typeof value === 'string' && STOP_ID_SET.has(value)
